@@ -1,0 +1,9 @@
+Questions to find answers to:
+A) What physics are you trying to model and analyse? (Describe clearly, in words, what physical phenomenon you wish to analyse)
+B) What PDE are you trying to solve, associated with the Physics described in A? (write the PDE)
+C) Boundary value and/or initial values for my specific problem: (be CONSISTENT with what you wrote in A)
+D) What numerical method are you going to deploy and why? (Describe, in words, which method you intend to apply and why you have chosen it as opposed to other alternatives)
+E) I am going to discretise my PDE as the following (show the steps from continuous to discrete equation and boundary/initial conditions
+F) Plot the numerical results comprehensively and discuss them (discuss how the results describe the physics and comment on any discrepancies or unexpected behaviours). Use multiple types of visual graphs.
+
+Easy!
