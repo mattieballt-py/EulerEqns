@@ -29,15 +29,6 @@ Set up of BC's
 Domain[0,:] = U * np.cos(w * t)  # °C temp at x = a for all of t
 Domain[-1,:] = 0  # ms-1 at last y for all of t = 0
 
-"""
-Stability Condition Check
-"""
-r = 1
-# Stability condition check: required for stability of the numerical solution
-stability_factor = r
-print("Stability factor =", stability_factor)
-if stability_factor > 0.5:
-    raise ValueError("Stability condition violated! Reduce dt or increase dx.")
 
 """
 Solving PDE 
