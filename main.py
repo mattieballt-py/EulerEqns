@@ -10,58 +10,51 @@ w = 10 # Hz, frequency of oscillations
 tend = 3600  # s (simulation time: 1 hour)
 
 # parameters
-dy = 0.5 # m, step size in y grid
 dt = 0.05 # s, step size in t grid
-
+dy = np.sqrt(dt*v) # setting r = 1, so dy changes to allow this
+print("dy now",dy)
 # Arrays
-t = np.linspace(0,5,dt)  # x has length N+1, going from a to b
+t = np.arange(0,5,dt)  # x has length N+1, going from a to b
 y = np.arange(0,10,dy) # y array with 
-
+N = len(t)
+P = len(y)
 # Initialize the domain grid in x-t
-u = np.zeros((len(t), len(y)))  # Create an empty domain grid in x and t
+Domain = np.zeros((len(y), len(t)))  # Create an empty domain grid in x and t
+
 
 """
 Set up of BC's
 """
-
 # want to set y = 0, all t u(0,t)= Ucoswt
-u[:,0] = U * np.cos(w)  # °C temp at x = a for all of t
-u[:,-1] = 0  # ms-1 at last y for all of t = 0
-
-alpha = 1.172 * 10**-5  # thermal diffusivity constant
+Domain[0,:] = U * np.cos(w * t)  # °C temp at x = a for all of t
+Domain[-1,:] = 0  # ms-1 at last y for all of t = 0
 
 """
-Code
+Stability Condition Check
 """
-# u is a function of y,t so an array with t rows and 
-# need a grid in x and then the y is time
-
-# parameters
-
-t = np.linspace(0,5,dt)  # x has length N+1, going from a to b
-y = np.arange(0,10,dy) # y array with 
-
-print(t,y)
-
-Ta = 50  # °C temp at x = a for all of t
-Tb = 70  # °C temp at x = b for all of t
-
-alpha = 1.172 * 10**-5  # thermal diffusivity constant
-
-# Initialize the domain grid in x-t
-Domain = np.zeros((N + 1, P + 1))  # Create an empty domain grid in x and t
-Domain[:, 0] = 10  # Initial condition: the entire bar is at 10°C initially
-Domain[0, :] = Ta  # Set boundary condition: temp at x = a remains 50°C
-Domain[-1, :] = Tb  # Set boundary condition: temp at x = b remains 70°C
-
-# Debugging print statements
-print("Shape of Domain:", u)
-
+r = 1
 # Stability condition check: required for stability of the numerical solution
-stability_factor = alpha * dt / dy**2
+stability_factor = r
 print("Stability factor =", stability_factor)
 if stability_factor > 0.5:
     raise ValueError("Stability condition violated! Reduce dt or increase dx.")
+
+"""
+Solving PDE 
+"""
+# u is a function of y,t so an array with t rows and 
+def u(Domain, v, dy, dt, N, P):
+    for k in range(0, len(t) + 1):
+        print("hi")
+    return
+
+
+print("t",t,"y",y)
+
+Domain = u
+# Debugging print statements
+print("Shape of Domain:", u)
+
 
 # Function to compute the temperature evolution
 def Temps(Domain, alpha, dt, dx, N, P):
@@ -76,17 +69,23 @@ def Temps(Domain, alpha, dt, dx, N, P):
 
     return T
     
-T = Temps(Domain, alpha, dt, dx, N, P)
+T = Temps(Domain, alpha, dt, dy, len(t), len(y))
 plt.figure(figsize=(8, 5))
 
-for time_step in [0, P//4, P//2, P]:  # Choose a few time steps to plot
-    plt.plot(x, T[:, time_step], label=f"t = {time_step*dt} s")
 
-plt.xlabel("Position along rod (m)")
-plt.ylabel("Temperature (°C)")
-plt.title("Temperature Distribution Along the Rod Over Time")
-plt.legend()
-plt.grid()
+"""
+Plot Contour of Velocity Evolution (t on x-axis, y on y-axis)
+"""
+plt.figure(figsize=(8, 6))
+
+# Create a contour plot (alternative to imshow)
+T, Y = np.meshgrid(t, y)  # Create meshgrid for contour plot
+plt.contourf(T, Y, U_t.T, levels=20, cmap="coolwarm")
+
+plt.colorbar(label="Velocity (m/s)")
+plt.xlabel("Time (s)")
+plt.ylabel("Depth (m)")
+plt.title("Velocity Evolution in Stokes' Second Problem")
 plt.show()
 
 
