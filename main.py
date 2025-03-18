@@ -29,7 +29,7 @@ Domain[:,0] = U * np.cos(w * t)  # °C temp at x = a for all of t
 Domain[:,-1] = 0  # ms-1 at last y for all of t = 0
 
 """
-Guass
+Gauss
 """
 # Gauss elimination:
 def MyGauss(A,b):
@@ -45,7 +45,7 @@ def MyGauss(A,b):
             A[j,:] -= p * A[i,:]
             # compute the new element of row j in vector b
             b[j] -= p * b[i]
-    # evauate, by back substitution the solution
+    # evaluate, by back substitution the solution
     x = np.zeros(n)
     for i in range(n-1,-1,-1):
         # contribution from b (right hand side of the equation)
