@@ -16,20 +16,20 @@ t = np.arange(0,5,dt)  # x has length N+1, going from a to b
 y = np.arange(0,10,dy) # y array with 
 N = len(y)
 P = len(t)
-
+"""
 # Initialize the domain grid in x-t
 Domain = np.zeros((N,P))  # Create an empty domain grid in x and t
 
 
 """
-Set up of BC's
+#Set up of BC's
 """
 # want to set y = 0, all t u(0,t)= Ucoswt
-Domain[:,0] = U * np.cos(w * t)  # °C temp at x = a for all of t
+Domain[:,0] = U * np.cos(0.2)  # °C temp at x = a for all of t
 Domain[:,-1] = 0  # ms-1 at last y for all of t = 0
 
 """
-Gauss
+Guass
 """
 # Gauss elimination:
 def MyGauss(A,b):
@@ -55,7 +55,7 @@ def MyGauss(A,b):
     return x
 
 """
-Solving PDE using Crank-Nicholson
+#Solving PDE using Crank-Nicholson
 """
 def u_cranksolve(Domain, v, dy, dt, N, P):
     r = v * dt / (2 * dy**2)
@@ -88,6 +88,77 @@ def u_cranksolve(Domain, v, dy, dt, N, P):
 
 # solve PDE using function
 u = u_cranksolve(Domain, v, dy, dt, N, P)
+"""
+# tried again but splitting to N+1 matrix A and N matrix B:
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Parameters
+nu = 1e-6  # Kinematic viscosity (m^2/s)
+U = 1.0    # Amplitude of oscillation
+omega = 2 * np.pi  # Frequency of oscillation
+y_max = 0.1  # Maximum height (m)
+Ny = 50  # Number of grid points in y-direction
+Nt = 500  # Number of time steps
+T = 3  # Total simulation time (s)
+dy = y_max / (Ny - 1)  # Spatial step size
+dt = T / Nt  # Time step size
+r = nu * dt / dy**2  # Crank-Nicholson coefficient
+
+# Grid
+y = np.linspace(0, y_max, Ny)
+t = np.linspace(0, T, Nt)
+u = np.zeros((Ny, Nt))  # Velocity field, initially at rest
+
+# Initialize matrices
+A = np.zeros((Ny, Ny))
+B = np.zeros((Ny, Ny))
+
+# Construct A and B
+for i in range(1, Ny-1):
+    A[i, i-1] = -r
+    A[i, i] = 1 + 2*r
+    A[i, i+1] = -r
+    
+    B[i, i-1] = r
+    B[i, i] = 1 - 2*r
+    B[i, i+1] = r
+
+# Apply boundary conditions
+A[0, :] = 0
+A[0, 0] = 1
+A[-1, :] = 0
+A[-1, -1] = 1
+
+B[0, :] = 0
+B[0, 0] = 1
+B[-1, :] = 0
+B[-1, -1] = 1
+
+# Time-stepping loop
+for n in range(Nt - 1):
+    # Boundary conditions
+    u[0, n+1] = U * np.cos(omega * t[n+1])
+    
+    # Compute b = B u^n + boundary conditions
+    b = B @ u[:, n]
+    b[0] = U * np.cos(omega * t[n+1])
+    b[-1] = 0
+
+    # Solve Au^(n+1) = b
+    u[:, n+1] = np.linalg.solve(A, b)
+
+# Plot results
+plt.figure(figsize=(8, 6))
+for i in range(0, Nt, Nt // 10):
+    plt.plot(y, u[:, i], label=f't = {t[i]:.2f} s')
+
+plt.xlabel("Height y (m)")
+plt.ylabel("Velocity u(y, t)")
+plt.title("Velocity Profile Evolution (Crank-Nicholson)")
+plt.legend()
+plt.grid()
+plt.show()
 
 """
 Scatter Plot of Velocity Profiles at Specific Times
