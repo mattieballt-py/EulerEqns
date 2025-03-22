@@ -122,7 +122,6 @@ for n in range(Nt): # going from 0 to Nt-1
         plt.plot(y, u, label=label_text) # Plot the current solution with the corresponding label
 
 
-
 # In this section I am showing the results
 plt.legend()
 plt.show()
